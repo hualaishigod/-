@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>课件保存埋点分析报告 v3</title>
+<title>课件保存埋点分析报告</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
@@ -157,16 +157,13 @@ footer{margin-top:80px;padding:32px 0;border-top:1px solid var(--border);display
 <div class="container">
 
 <header>
-  <div class="header-label">数据分析报告 v3 · 课件保存问题溯因
-    <span class="badge badge-green">剔除极端异常</span>
-    <span class="badge badge-blue">新增：课件多次保存分析</span>
-  </div>
+  <div class="header-label">数据分析报告 · 课件保存问题溯因</div>
   <h1>教师课件<em>保存失败</em>与<em>保存时长</em>相关性分析<br>
     <span style="font-size:.5em;color:var(--text-dim);font-weight:400;">+ 课件多次保存行为与成败关系</span>
   </h1>
   <div class="header-meta">
     <span>数据区间：2026-03-17 全天</span>
-    <span>清洗后记录：2,375 条（剔除3条极端异常）</span>
+    <span>有效记录：2,375 条</span>
     <span>课件数：251 份</span>
     <span>涉及用户：86 名</span>
   </div>
@@ -177,14 +174,12 @@ footer{margin-top:80px;padding:32px 0;border-top:1px solid var(--border);display
   <div class="kpi">
     <div class="kpi-label">有效记录</div>
     <div class="kpi-value">2,375</div>
-    <div class="kpi-sub">剔除3条时长异常</div>
-    <div class="kpi-delta down">↓ 3条极端值移除</div>
+    <div class="kpi-sub">2026-03-17 全天</div>
   </div>
   <div class="kpi">
-    <div class="kpi-label">失败率（清洗后）</div>
+    <div class="kpi-label">整体失败率</div>
     <div class="kpi-value">4.55%</div>
     <div class="kpi-sub">108次失败 CI[3.78%,5.46%]</div>
-    <div class="kpi-delta down">↓ 略低于v2(4.67%)</div>
   </div>
   <div class="kpi">
     <div class="kpi-label">成功时长中位数</div>
@@ -195,32 +190,31 @@ footer{margin-top:80px;padding:32px 0;border-top:1px solid var(--border);display
     <div class="kpi-label">第1次保存失败率</div>
     <div class="kpi-value">9.96%</div>
     <div class="kpi-sub">后续保存仅 3.91%</div>
-    <div class="kpi-delta up">⚠ 首次保存风险高</div>
   </div>
   <div class="kpi">
     <div class="kpi-label">失败后再次失败率</div>
     <div class="kpi-value">47.9%</div>
     <div class="kpi-sub">vs 正常接续 1.82%</div>
-    <div class="kpi-delta up">⚠ 失败具有粘性</div>
   </div>
 </div>
 
 <!-- Summary -->
 <div class="summary-banner">
-  <strong>v3 核心变化：</strong>剔除3条极端时长异常（dizhimin 58,088s × 2条、fusiyu 22,214s）后，
-  失败率从 4.67% 微降至 <strong>4.55%</strong>，时长与失败状态的相关系数从 −0.153 <strong>恢复至 −0.821</strong>（强相关），更真实反映超时型失败的主导地位。
-  <br><strong>新增发现：</strong>
+  <strong>核心结论：</strong>保存失败的主导原因是<strong>请求超时（约30秒被截断）</strong>，占全部失败的 62%，时长与失败状态强相关（r=−0.821）。
+  成功保存时长中位数仅 397ms，失败时长中位数高达 30,005ms，相差 75 倍。
+  页数与失败率弱显著相关（r=−0.129），<em>201页以上课件失败率高达 64%</em>，需重点关注。
+  <br><strong>多次保存新发现：</strong>
   <em>① 首次保存失败率（9.96%）是后续保存（3.91%）的 2.5 倍</em>，首次保存超时占其失败的 76%；
   <em>② 一旦失败，下次仍失败的概率高达 47.9%</em>（正常续保仅 1.82%），失败具有极强的"粘性"；
-  <em>③ 高频保存（50次+）课件失败率最低（3.14%），低频单次保存失败率最高（12.12%）</em>，说明保存次数越多的课件越"健康"。
+  <em>③ 高频保存（50次+）课件失败率最低（3.14%），单次保存课件失败率最高（12.12%）</em>。
 </div>
 
 <!-- Section 1: Correlation -->
 <section>
   <div class="section-header">
     <span class="section-num">01</span>
-    <h2>三维相关性矩阵（剔除极端值后）</h2>
-    <span class="section-tag badge-yellow">关键指标更新</span>
+    <h2>三维相关性矩阵：页数 × 时长 × 失败</h2>
+    <span class="section-tag badge-yellow">核心相关性</span>
   </div>
   <div class="chart-grid-2">
     <div class="chart-box">
@@ -250,13 +244,10 @@ footer{margin-top:80px;padding:32px 0;border-top:1px solid var(--border);display
         ★★ p&lt;0.001 强显著 &nbsp;★ p&lt;0.001 显著<br>
         <span style="color:var(--accent2)">■</span> 强相关(|r|>0.7) &nbsp;
         <span style="color:var(--accent)">■</span> 弱相关 &nbsp;
-        <span style="color:var(--accent4)">■</span> 剔除后新显著
+        <span style="color:var(--accent4)">■</span> 正向相关
       </div>
       <div style="margin-top:10px;padding:10px;background:rgba(110,232,164,.06);border-left:2px solid var(--accent4);font-size:11px;color:var(--text-muted);line-height:1.7;">
-        <strong style="color:var(--accent4)">剔除后最大变化：</strong><br>
-        时长→失败：−0.153 → <strong style="color:var(--accent2)">−0.821</strong>（强相关恢复）<br>
-        页数→时长：−0.010 → <strong style="color:var(--accent4)">+0.069</strong>（方向反转且显著）<br>
-        <span style="color:var(--text-dim);font-size:10px;">3条极端值将时长均值从416ms拉到59,521ms，严重扭曲了两项相关系数</span>
+        <strong style="color:var(--accent4)">数据说明：</strong>数据集中存在3条时长异常记录（dizhimin、fusiyu，时长达数小时），疑似前端埋点计算逻辑问题，已从统计中剔除。上述相关系数基于有效记录计算。
       </div>
     </div>
     <div class="chart-box">
@@ -268,28 +259,26 @@ footer{margin-top:80px;padding:32px 0;border-top:1px solid var(--border);display
   <div class="insight-grid">
     <div class="insight-card hl-red">
       <div class="insight-icon">⚡</div>
-      <div class="insight-title">时长 → 失败：强相关恢复（r=−0.821）</div>
+      <div class="insight-title">时长 → 失败：强相关（r=−0.821）</div>
       <div class="insight-body">
-        剔除3条极端值后，相关系数从 −0.153 恢复至 <strong>−0.821</strong>。<br>
         失败时长中位数 <strong>30,005ms</strong>，成功中位数 <strong>397ms</strong>，相差 75倍。<br>
-        <em>超时截断</em> 仍是主导失败机制。
+        超时截断是主导失败机制，62% 的失败时长精确卡在约 30秒，是服务端统一超时配置触发的结果。
       </div>
     </div>
     <div class="insight-card hl-yellow">
       <div class="insight-icon">📄</div>
-      <div class="insight-title">页数 → 失败：弱显著（r=−0.129）</div>
+      <div class="insight-title">页数 → 失败：弱显著（r=−0.129，p&lt;0.001）</div>
       <div class="insight-body">
-        剔除后结论维持：大页数与失败轻度相关。<br>
-        页数 → 时长 相关系数由 −0.010 转正为 <strong>+0.069</strong>，说明极端异常掩盖了页数越多时长略长的真实规律。<br>
-        201页+ 失败率 <em>64%</em> 的结论不变。
+        大页数课件与失败存在轻度相关，201页+ 区间失败率高达 <em>64%</em>，远超其他区间。<br>
+        页数 → 时长 正相关（r=+0.069），页数越多保存时长略长，但并非失败的决定性因素。
       </div>
     </div>
     <div class="insight-card">
       <div class="insight-icon">🎯</div>
-      <div class="insight-title">3条极端值的影响有多大？</div>
+      <div class="insight-title">数据质量：3条异常时长已剔除</div>
       <div class="insight-body">
-        仅占总数 <strong>0.13%</strong> 的3条记录，将时长均值从 <b>1,193ms</b> 拉高至 <em>59,521ms</em>（↑49倍），将时长→失败相关系数从 <strong>−0.821</strong> 稀释至 −0.153。<br>
-        这三条时长应视为<u>埋点数据质量问题</u>，非真实保存行为。
+        dizhimin（2条）和 fusiyu（1条）的保存时长达数小时，物理上不可能是真实等待时长。<br>
+        根因疑似<u>前端时长计算以页面加载时刻为起点</u>，而非点击保存时刻，属于埋点逻辑 Bug，建议修复。
       </div>
     </div>
   </div>
@@ -299,8 +288,8 @@ footer{margin-top:80px;padding:32px 0;border-top:1px solid var(--border);display
 <section>
   <div class="section-header">
     <span class="section-num">02</span>
-    <h2>新增分析：同一课件多次保存与成败 / 时长的关系</h2>
-    <span class="section-tag badge-green">本次新增核心模块</span>
+    <h2>同一课件多次保存与成败 / 时长的关系</h2>
+    <span class="section-tag badge-green">课件维度</span>
   </div>
 
   <!-- Key stats -->
@@ -408,7 +397,7 @@ footer{margin-top:80px;padding:32px 0;border-top:1px solid var(--border);display
 <section>
   <div class="section-header">
     <span class="section-num">03</span>
-    <h2>失败模式分类（剔除极端值后）</h2>
+    <h2>失败模式分类：三种截然不同的失败路径</h2>
     <span class="section-tag badge-red">根因识别</span>
   </div>
   <div class="chart-grid-2">
@@ -475,7 +464,7 @@ footer{margin-top:80px;padding:32px 0;border-top:1px solid var(--border);display
 <section>
   <div class="section-header">
     <span class="section-num">05</span>
-    <h2>时间维度：全天失败分布（剔除后）</h2>
+    <h2>时间维度：全天失败分布</h2>
     <span class="section-tag badge-blue">时间维度</span>
   </div>
   <div class="chart-box full" style="margin-bottom:20px;">
@@ -495,7 +484,7 @@ footer{margin-top:80px;padding:32px 0;border-top:1px solid var(--border);display
   <div class="insight-grid" style="margin-top:20px;">
     <div class="insight-card hl-red">
       <div class="insight-icon">🕘</div>
-      <div class="insight-title">09时失败率 12.1%（剔除后）</div>
+      <div class="insight-title">09时失败率 12.1%，全天最高</div>
       <div class="insight-body">
         剔除 fusiyu 的极端超时后，09时失败率从 17.1% 降至 <strong>12.1%</strong>（4/33），但仍是全天最高。<br>
         4条失败中 3 条来自 yuanhezi 的201页课件超时，1条来自 jinmeng01。<em>早高峰冷启动</em>问题依然显著。
@@ -671,7 +660,7 @@ footer{margin-top:80px;padding:32px 0;border-top:1px solid var(--border);display
 <section>
   <div class="section-header">
     <span class="section-num">07</span>
-    <h2>改进建议（基于 v3 分析）</h2>
+    <h2>改进建议与后续分析方向</h2>
   </div>
   <ul class="rec-list">
     <li class="rec-item">
@@ -706,7 +695,7 @@ footer{margin-top:80px;padding:32px 0;border-top:1px solid var(--border);display
       <div class="rec-num">05</div>
       <div>
         <div class="rec-title"><span class="badge badge-yellow" style="margin-right:8px;">P1</span>排查09时早高峰冷启动 · 12.1% 失败率</div>
-        <div class="rec-body">09时失败率 12.1%（剔除极端值后），是全天最高。与运维确认：服务是否在夜间降配，09时首批请求是否命中未预热状态。建议 08:30 前发起健康检查预热请求，或配置最低保留实例数保证09时可用性。</div>
+        <div class="rec-body">09时失败率 12.1%，是全天最高。与运维确认：服务是否在夜间降配，09时首批请求是否命中未预热状态。建议 08:30 前发起健康检查预热请求，或配置最低保留实例数保证09时可用性。</div>
       </div>
     </li>
     <li class="rec-item">
@@ -719,9 +708,72 @@ footer{margin-top:80px;padding:32px 0;border-top:1px solid var(--border);display
   </ul>
 </section>
 
+<!-- Section 8: Next Steps -->
+<section>
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2>后续分析方向</h2>
+  </div>
+
+  <div style="margin-bottom:20px;padding:14px 18px;background:var(--surface2);border-left:3px solid var(--accent3);font-size:12px;color:var(--text-muted);line-height:1.7;">
+    当前数据为单日（2026-03-17）全天记录，以下方向可在补充更多数据后进行，以验证结论的稳定性并深入定位根因。
+  </div>
+
+  <div class="insight-grid">
+    <div class="insight-card hl-yellow">
+      <div class="insight-icon">📅</div>
+      <div class="insight-title">方向①：时间规律稳定性验证（补充多日数据）</div>
+      <div class="insight-body">
+        当前仅覆盖单日，09时高失败率、14–15时高并发失败是否为规律性现象，还是当天偶发？<br>
+        <strong>建议：</strong>补充 2 周（约 3–5 万条）数据，按星期维度重新分析，识别是否有"周一最难保存"等规律，以及节假日 vs 工作日的差异。
+      </div>
+    </div>
+    <div class="insight-card hl-red">
+      <div class="insight-icon">🔍</div>
+      <div class="insight-title">方向②：快速失败的根因定位（需服务端日志）</div>
+      <div class="insight-body">
+        18条快速失败（&lt;500ms，状态=0）与超时失败机制完全不同，但当前数据无法判断是权限问题、课件状态锁定还是服务异常。<br>
+        <strong>建议：</strong>拉取这 18 条对应的服务端请求日志，重点查看 HTTP 响应码（4xx vs 5xx）和错误信息，才能确定根因。
+      </div>
+    </div>
+    <div class="insight-card hl-purple">
+      <div class="insight-icon">📦</div>
+      <div class="insight-title">方向③：引入文件大小字段（当前最大盲区）</div>
+      <div class="insight-body">
+        当前以"页数"作为课件体积的代理变量，但同样页数的课件可能因图片、视频资源体积差异巨大。<br>
+        <strong>建议：</strong>在埋点中新增 <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:2px;font-size:11px;">file_size_kb</code> 字段，重新分析文件大小与超时的关系，这将比页数更直接地解释保存时长。
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-icon">🌐</div>
+      <div class="insight-title">方向④：引入网络类型 / 客户端字段</div>
+      <div class="insight-body">
+        liailian、zhengyang07 等用户失败率异常高（33–100%），但无法判断是个人网络问题还是系统性问题。<br>
+        <strong>建议：</strong>补充 <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:2px;font-size:11px;">net_type</code>（WiFi/4G/有线）、<code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:2px;font-size:11px;">client_type</code>（PC/平板）字段，分析网络类型与失败率的关系。
+      </div>
+    </div>
+    <div class="insight-card hl-green">
+      <div class="insight-icon">🔁</div>
+      <div class="insight-title">方向⑤：自动重试机制上线后的 A/B 对比</div>
+      <div class="insight-body">
+        当前数据已显示失败后重试成功率约 52%，说明重试是有效的。<br>
+        <strong>建议：</strong>在产品侧上线"失败后自动延迟 3s 重试"机制，通过 A/B 实验对比加入重试组 vs 对照组的最终失败率，量化重试的实际改善效果，为是否全量推出提供决策依据。
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-icon">📐</div>
+      <div class="insight-title">方向⑥：大页数课件（201页+）专项抽样调研</div>
+      <div class="insight-body">
+        当前201页以上课件仅 25 条记录，失败率 64% 的结论样本偏小。<br>
+        <strong>建议：</strong>专项导出近 30 天内所有201页以上课件的保存记录（估计约 500–1,000 条），同时结合课件文件大小，判断是"页数多"还是"文件大"在驱动高失败率。
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer>
-  <span>课件保存埋点分析报告 v3 · 2026-03-19 · 剔除3条极端异常</span>
-  <span>有效记录 2,375 条 · 251份课件 · 86名用户</span>
+  <span>课件保存埋点分析报告 · 2026-03-19</span>
+  <span>2,375 条有效记录 · 251份课件 · 86名用户</span>
 </footer>
 </div>
 
